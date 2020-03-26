@@ -30,7 +30,7 @@ data = ImageDataBunch.from_folder(
     num_workers=4
 ).normalize(imagenet_stats)
 
-# watching 'input: what is in'
+# see the input
 
 data.show_batch(row=3, figsize=(7, 8))
 data.classes, data.c, len(data.train_ds), len(data.valid_ds)
@@ -47,7 +47,7 @@ learn.recorder.plot()
 learn.fit_one_cycle(4, max_lr=slice(1e-4, 3e-3))
 learn.save('stage-2')
 
-# watching 'output: what is out'
+# see the output
 learn.load('stage-2')
 interp = ClassificationInterpretation.from_learner(learn)
 interp.plot_confusion_matrix()
