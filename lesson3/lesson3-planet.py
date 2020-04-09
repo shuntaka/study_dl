@@ -1,46 +1,66 @@
 # set up for colab
+'''
 !curl https: // course.fast.ai/setup/colab | bash
+'''
 
 # load additional dependencies at the top
 from fastai.vision import *
 from google.colab import drive
 
+'''
 %reload_ext autoreload
 %autoreload 2
 %matplotlib inline
-
-# (skip)
-# configure kaggle credential
-# !touch kaggle.json
-# !echo '{"username":"shunsuketakamiya","key":"bf88e0e70899c4da269effb8a1f81d2b"}' >> kaggle.json
-# !mkdir - p ~/.kaggle/
-# ! mv kaggle.json ~/.kaggle/
+'''
 
 # manually download the dataset to Notebooks/FastAI/data/planet at Google Drive from Kaggle
 
+# current folder structure
+'''
+folder structure is below:
+/content    <= current directory
+    /drive  <= everything under 'My Drive' at Google Drive is mounted
 
-# mount google drive and copy manually downloaded data
-drive.mount(’/ content/drive’)
-!ls drive/My\ Drive/Colab\ Notebooks/
+/root
+    /.fastai
+        /data <= copy the data in Google Drive under this directory
+'''
+# mount google drive and copy manually downloaded data(uncomment to use)
+drive.mount('/content/drive')
 
-# create a local directory for storing data
+# copy the the mounted directory to a local directry. (uncomment to use)
+'''
+!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/planet /root/.fastai/data
+!ls /root/.fastai/data
+'''
+
+# configure data path
 path = Config.data_path()/'planet'
-path.mkdir(parents=True, exist_ok=True)
 
-# copy the in the mounted directory to a local directry. remove unnecessary spaces before pasting
-!cp - r drive/My\ Drive/Colab\ Notebooks/FastAI/data/planet / root/.fastai/data/
-!ls / root/.fastai/data/planet
-
-# (skip)
-# download labels
-# ! kaggle competitions download - c planet-understanding-the-amazon-from-space - p {path}
+# SKIP THIS
+# configure kaggle credential & download data set
+'''
+!touch kaggle.json
+!echo '{"username":"shunsuketakamiya","key":"somekeyhere"}' >> kaggle.json
+!mkdir - p ~/.kaggle/
+! mv kaggle.json ~/.kaggle/
+! kaggle competitions download - c planet-understanding-the-amazon-from-space - p {path}
+'''
 
 # unzip the dataset. remove unnecessary spaces before pasting
-!wget https: // repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh & & bash Anaconda3-5.2.0-Linux-x86_64.sh - bfp / usr/local
+'''
+!wget https://repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh && bash Anaconda3-5.2.0-Linux-x86_64.sh -bfp /usr/local
+'''
+
+# install 7zip
+'''
+!conda install --yes --prefix {sys.prefix} -c haasad eidl7zip
+'''
 
 # unzip the dataset
-! conda install - -yes - -prefix {sys.prefix} - c haasad eidl7zip
-! 7za - bd - y - so x {path}/train-jpg.tar.7z | tar xf - -C {path.as_posix()}
+'''
+! 7za -bd -y -so x {path}/train-jpg.tar.7z | tar xf - -C {path.as_posix()}
+'''
 
 # see the labels
 # path: PosixPath('/root/.fastai/data/planet)
@@ -54,6 +74,9 @@ tfms = get_transforms(flip_vert=True, max_lighting=0.1,
 # create data
 #
 
+# path
+path = Config.data_path()/'planet'
+path.mkdir(parents=True, exist_ok=True)
 
 # specifying the source for dataset
 # by specifying the location of images, labels, and ratio of validation set
@@ -83,10 +106,10 @@ data.show_batch(rows=3, figsize=(12, 9))
 
 
 #
-# create cnn model
+# create model
 #
 
-# create cnn
+# create cnn model
 arch = models.resnet50
 acc_02 = partial(accuracy_thresh, thresh=0.2)
 f_score = partial(fbeta, thresh=0.2)
@@ -125,10 +148,11 @@ learn.save('stage-2-rn50')
 # train the model with progressive resizing
 #
 
-# load another data for the model
+# create a new data with different size
 data = src.transform(tfms, size=256)
         .databunch().normalize(imagenet_stats))
 
+# load another data onto the model
 learn.data=data
 data.train_ds[0][0].shape
 

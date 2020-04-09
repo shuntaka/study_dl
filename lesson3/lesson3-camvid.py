@@ -58,7 +58,7 @@ data.show_batch(2, figsize=(10,7), ds_type=DatasetType.Valid)
 
 
 # 
-# create cnn
+# create model
 #
 
 # create a dictionary for codes  
@@ -77,7 +77,7 @@ wd=le-2
 learn = unet_learner(data, models.resnet34, metrics=metrics, wd=wd)
 
 # 
-# train the cnn (1st stage)
+# train the model (1st stage)
 #
 
 # find learning rate
@@ -94,8 +94,14 @@ learn.load('stage-1')
 learn.show_results(rows=3, figsize=(8,9))
 
 #
-# fine tune the cnn (2nd stage)
+# fine tune the model (2nd stage)
 #
 
 # unfreeze all the layers
 learn.unfreeze()
+
+# find learning rate
+lrs = slice(lr/400, lr/4)
+
+# train the cnn model
+learn.fit_one_cycle(12, lrs, pct_start=0.8)
