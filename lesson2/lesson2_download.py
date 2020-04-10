@@ -10,39 +10,40 @@ window.open('data:text/csv;charset=utf-8,' + escape(urls.join('\n')));
 !mv ./fast-ai-data/violin.csv ./data/instruments/
 '''
 
-# current folder structure
+
+# directory structure
 '''
 folder structure is below;
 /content    <= current directory
-    /drive  <= everything under 'My Drive' at Google Drive is mounted
-    /data   <= copy the data in Google Drive under this directory  
+    /data
+    /drive   
+        /My\ Drive/Colab\ Notebooks/FastAI/data
+            /download
+                
+/root/.fastai
+    /data
+        /download
+
 '''
+
+# set path
+from fastai.vision import *
+from fastai import *
+path = Config.data_path()/'download'
 
 # mount Google Drive under /content/drive
-from fastai import *
-from fastai.vision import *
+'''
 from google.colab import drive
 drive.mount('/content/drive')
-
-'''
 !ls drive/My\ Drive/Colab\ Notebooks/FastAI/data/download
-
-violin.csv
-viola.csv
 '''
 
 # copy /content/drive/.../data/download folder under /content/data/instruments
 '''
-!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/download /content/data
-!ls /content/data/download
+!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/download /root/.fastai/data/
+!ls /root/.fastai/data/download
 '''
 
-# set path
-path = Path('data/download')
-path.ls()
-'''
-
-'''
 
 # download images for violin
 folder = 'violin'

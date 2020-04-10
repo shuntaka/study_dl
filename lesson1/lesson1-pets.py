@@ -20,6 +20,15 @@ PosixPath('/root/.fastai/data/oxford-iiit-pet')
 path_anno = path/'annotations'
 path_img = path/'images'
 
+# directory structure
+'''
+/root/.fastai
+    /data
+        /oxford-iiit-pet
+            /images
+
+'''
+
 fnames = get_iamge_files(path_img)
 '''
  PosixPath('/root/.fastai/data/oxford-iiit-pet/images/staffordshire_bull_terrier_114.jpg'),

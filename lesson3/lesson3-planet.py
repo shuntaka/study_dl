@@ -15,27 +15,38 @@ from google.colab import drive
 
 # manually download the dataset to Notebooks/FastAI/data/planet at Google Drive from Kaggle
 
-# current folder structure
+# directory structure
 '''
 folder structure is below:
 /content    <= current directory
-    /drive  <= everything under 'My Drive' at Google Drive is mounted
+    /drive
+        /My\ Drive/Colab\ Notebooks/FastAI/data
+            /planet
 
 /root
     /.fastai
-        /data <= copy the data in Google Drive under this directory
+        /data
+            /planet
+                /train-jpg.tar.7z
 '''
-# mount google drive and copy manually downloaded data(uncomment to use)
-drive.mount('/content/drive')
 
-# copy the the mounted directory to a local directry. (uncomment to use)
-'''
-!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/planet /root/.fastai/data
-!ls /root/.fastai/data
-'''
 
 # configure data path
 path = Config.data_path()/'planet'
+
+# mount google drive and copy manually downloaded data(uncomment to use)
+'''
+from google.colab import drive
+drive.mount('/content/drive')
+!ls drive/My\ Drive/Colab\ Notebooks/FastAI/data/planet
+'''
+
+# copy the data
+'''
+!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/planet /root/.fastai/data/
+!ls /root/.fastai/data/planet
+'''
+
 
 # SKIP THIS
 # configure kaggle credential & download data set
@@ -90,13 +101,18 @@ src = (ImageList.from_csv(
     .split_by_rand_pct(0.2)
     .label_from_df(label_delim=' '))
 
-# (1)with datasets(),
-# create datasets for training & validatoin from the specified source
-# (2) and then, with databunch(), do 2 things at one go.
-# (a) create 'data loader'for each of training & validation dataset
-# which creates mini batch out of dataset and pop it on to GPU,
-# (b) combine the two data loader together
-# combined one is callled databunch)
+'''
+ (1)with datasets(),
+ create datasets for training & validatoin from the specified source
+
+ (2) and then, with databunch(), do 2 things at one go.
+ (a) create 'data loader'for each of training & validation dataset
+ which creates mini batch out of dataset and pop it on to GPU,
+
+ (b) combine the two data loader together
+ combined one is callled databunch)
+'''
+
 data = (src.datasets()
         .transform(tfms, size=128)
         .databunch().normalize(imagenet_stats))
@@ -141,7 +157,7 @@ learn.lr_find()
 learn.recorder.plot()
 
 # train the model
-learn.fit_one_cycle(5, slice(1e-6, lr/5))
+learn.fit_one_cycle(5, slice(1e-5, lr/5))
 learn.save('stage-2-rn50')
 
 #

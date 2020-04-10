@@ -10,18 +10,30 @@
 %matplotlib inline
 '''
 
+# directories
+'''
+/root/.fastai
+        /data
+                /imdb_sample
+                        /texts.csv
+'''
+
 #
 # getting data
 #
 
 path = untar_data(URLs.IMDB_SAMPLE)
 path.ls()
+'''
+[PosixPath('/root/.fastai/data/imdb_sample/texts.csv')]
+'''
+
 
 df = pd.read_csv(path/'texts.csv')
 df.head()  # see below
 
 '''
-label	text	is_valid
+        label	        text	                                                is_valid
 0	negative	Un-bleeping-believable! Meg Ryan doesn't even ...	False
 1	positive	This is a extremely well-made film. The acting...	False
 2	negative	Every once in a long while a movie will come a...	False
@@ -32,15 +44,21 @@ df['text'][1]
 # 'This is a extremely well-made film. The acting, script and camera-work are all first
 
 #
-# creating data at one go (tokenization & numericalization at one go)
+# creating data at one go (tokenization & numericalization)
 #
 
 # tokenization and numericalization at one go
 data_lm = TextDataBunch.from_csv(path, 'texts.csv')
-data_lm.show_batch()
-
 data_lm.save()
-
+data.show_batch()
+'''
+text	target
+xxbos xxmaj raising xxmaj victor xxmaj vargas : a xxmaj review \n \n xxmaj you know , xxmaj raising xxmaj victor xxmaj vargas is like sticking your hands into a big , steaming bowl of xxunk . xxmaj it 's warm and gooey , but you 're not sure if it feels right . xxmaj try as i might , no matter how warm and gooey xxmaj raising xxmaj	negative
+xxbos xxup the xxup shop xxup around xxup the xxup corner is one of the sweetest and most feel - good romantic comedies ever made . xxmaj there 's just no getting around that , and it 's hard to actually put one 's feeling for this film into words . xxmaj it 's not one of those films that tries too hard , nor does it come up with	positive
+xxbos xxmaj now that xxmaj che(2008 ) has finished its relatively short xxmaj australian cinema run ( extremely limited xxunk screen in xxmaj sydney , after xxunk ) , i can xxunk join both xxunk of " xxmaj at xxmaj the xxmaj movies " in taking xxmaj steven xxmaj soderbergh to task . \n \n xxmaj it 's usually satisfying to watch a film director change his style /	negative
+xxbos xxmaj this film sat on my xxmaj tivo for weeks before i watched it . i dreaded a self - indulgent xxunk flick about relationships gone bad . i was wrong ; this was an xxunk xxunk into the screwed - up xxunk of xxmaj new xxmaj yorkers . \n \n xxmaj the format is the same as xxmaj max xxmaj xxunk ' " xxmaj la xxmaj ronde	positive
+xxbos xxmaj many neglect that this is n't just a classic due to the fact that it 's the first xxup 3d game , or even the first xxunk - up . xxmaj it 's also one of the first stealth games , one of the xxunk definitely the first ) truly claustrophobic games , and just a pretty well - xxunk gaming experience in general . xxmaj with graphics	positiv
+'''
 
 #
 # creating data at one go 2 (tokenization & numericalization)
@@ -58,19 +76,28 @@ xxbos xxup the xxup shop xxup around xxup the xxup corner is one of the sweetest
 
 
 # numericalization
-data.vocab.itos[:10]  # see below
-# ['xxunk',
-#  'xxpad',
-#  'xxbos',
-#  ...
-#  'the',
-#  '.']
-
+data.vocab.itos[:10]
+'''
+['xxunk',
+ 'xxpad',
+ 'xxbos',
+ 'xxeos',
+ 'xxfld',
+ 'xxmaj',
+ 'xxup',
+ 'xxrep',
+ 'xxwrep',
+ 'the']
+'''
 data.train_ds[0][0]
-# Text xxbos i know that originally, this film was xxup not a box office hit...
+'''
+Text xxbos xxmaj as an native of xxmaj bolton , this film has obvious appeal for me . xxmaj the location shots are fascinating and show a xxmaj bolton very much in xxunk - there are a number of scenes of apparent xxunk but this serves to show the town being xxunk - and the idea that the old must make way for the new is right at the heart of this film . a slightly miscast xxmaj james xxmaj mason leads an enjoyable ensemble in a story about a fuss over a xxunk that xxunk into a full - blown xxunk conflict , then a xxunk xxunk resolution . xxmaj though i 'm a bit too young to remember it fully , the xxunk of xxmaj xxunk life in the 60s is all here : xxunk up on a xxmaj friday , songs round the piano , the xxmaj sunday xxunk , good xxunk , the xxunk of xxunk , the massive importance of self - respect , and i was pleased to see xxmaj xxunk 's funniest lines from the play left intact . xxmaj there is no doubt that this film ought to be made available on xxup dvd - it is well crafted and most performances are well realised .
+'''
 
 data.train_ds[0][0].data[:10]
-# array([2, 18, 146, ..., 5])
+'''
+array([   2,   18,  146,   19, 3788,   10,   20,   31,   25,    5])
+'''
 
 #
 # creating data with the data block API
@@ -82,24 +109,61 @@ data = (TextList.from_csv(path, 'texts.csv', cols='text')
         .label_from_df(cols=0)
         .databunch())
 
+text_list TextList.from_csv(path, 'texts.csv', cols='text')
+text_list.inner_df
+'''
+        label	        text	                                                is_valid
+0	negative	Un-bleeping-believable! Meg Ryan doesn't even ...	False
+1	positive	This is a extremely well-made film. The acting...	False
+2	negative	Every once in a long while a movie will come a...	False
+3	positive	Name just says it all. I watched this movie wi...	False
+4	negative	This movie succeeds at being one of the most u...	False
+'''
+
 #
 # create & train a language model
 #
 
-#
 bs = 48
+
+
+# directory structure
+'''
+/root/.fastai
+        /data
+                /imdb
+                        /train
+                                /neg
+                                /pos
+                        /test
+                        /unsup
+'''
 
 # getting data
 path = untar_data(URLs.IMDB)
 path.ls()
+'''
+[PosixPath('/root/.fastai/data/imdb/README'),
+ PosixPath('/root/.fastai/data/imdb/train'),
+ PosixPath('/root/.fastai/data/imdb/test'),
+ PosixPath('/root/.fastai/data/imdb/tmp_lm'),
+ PosixPath('/root/.fastai/data/imdb/imdb.vocab'),
+ PosixPath('/root/.fastai/data/imdb/unsup'),
+ PosixPath('/root/.fastai/data/imdb/tmp_clas')]
+'''
 
 #
 (path/'train').ls()
-
+'''
+[PosixPath('/home/ubuntu/.fastai/data/imdb/train/neg'),
+ PosixPath('/home/ubuntu/.fastai/data/imdb/train/unsupBow.feat'),
+ PosixPath('/home/ubuntu/.fastai/data/imdb/train/pos'),
+ PosixPath('/home/ubuntu/.fastai/data/imdb/train/labeledBow.feat')]
+'''
 
 # create data with special kind of TextDataBunch for language model
 data_lm = (TextList.from_folder(path)
-           .filter_by_folder(include=['train', 'text', 'unsup'])
+           .filter_by_folder(include=['train', 'test', 'unsup'])
            .split_by_rand_pct(0.1)
            .label_for_lm()
            .databunch(bs=bs))
@@ -196,7 +260,7 @@ learn.load('second')
 learn.freeze_to(-3)
 learn.fit_one_cycle(1, slice(5e-3/2.6**4), 5e-3), moms=(0.8, 0.7))
 learn.save('third')
-learn.save('third')
+learn.load('third')
 
 # whole layers
 learn.unfreeze()

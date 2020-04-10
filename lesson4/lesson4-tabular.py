@@ -3,16 +3,24 @@
 !curl https: // course.fast.ai/setup/colab | bash
 '''
 
-
 # dependencies
 from fastai.tabular import *
 
 
-# a
+# directory structure
+'''
+/root/.fastai
+        /data
+                /adult_sample
+                        /adult.csv
+                        /models
+                        /export.pkl
+'''
+
+# get data
 path = untar_data(URLs.ADULT_SAMPLE)
 df = pd.read_csv(path/'adult.csv')
 df.head()
-
 '''
 age	workclass	fnlwgt	education	education-num	marital-status	occupation	relationship	race	sex	capital-gain	capital-loss	hours-per-week	native-country	salary
 0	49	Private	101320	Assoc-acdm	12.0	Married-civ-spouse	NaN	Wife	White	Female	0	1902	40	United-States	>=50k
@@ -37,6 +45,8 @@ data = (TabularList.from_df(df, path=path, cat_names=cat_names, cont_names=cont_
         .databunch())
 
 learn = tabular_learner(data, layers=[200, 100], metrics=accuracy)
+
+learn.summary
 
 learn.fit(1, 1e-2)
 
