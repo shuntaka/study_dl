@@ -192,11 +192,12 @@ def update(x, y, lr):
         p.grad.zero_()
     return loss.item()
 
-    #
-    losses = [update(x, y, lr) for x, y in data.train_dl]
 
-    #
-    plt.plot(losses)
+#
+losses = [update(x, y, lr) for x, y in data.train_dl]
+
+#
+plt.plot(losses)
 
 #
 # 2 layers neural network model
