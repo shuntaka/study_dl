@@ -3,12 +3,25 @@
 !curl https: // course.fast.ai/setup/colab | bash
 '''
 
+# directory
+'''
+/root/.fastai
+    /data
+        /camvid
+            /images
+            /labels
+            /codes.txt
+            /valid.txt
+
+
+'''
+
 # import dependencies
+
+# download data
 from fastai.vision import *
 from fastai.callbacks.hooks import *
 from fastai.utils.mem import *
-
-# download data
 path = untar_data(URLs.CAMVID)
 path.ls()
 '''
@@ -32,6 +45,204 @@ path_img = path/'images'
                 /valid.txt
 '''
 
+#
+'''
+# src = (SegmentationItemList.from_folder(path_img)
+        .split_by_fname_file('../valid.txt')
+        .label_from_func(get_y_fn, classes=codes))
+
+src <LabelLists>
+    train <LabelList> (600 items)
+        [0] (Image (3, 360, 480), ImageSegment (1, 360, 480))
+        [1] (Image (3, 360, 480), ImageSegment (1, 360, 480))
+        [2] (Image (3, 360, 480), ImageSegment (1, 360, 480))
+        ...
+        [599] (Image (3, 360, 480), ImageSegment (1, 360, 480))
+
+
+        x <SegmentationItemList>
+            [0] Image(3,360,480)
+            [1] Image(3,360,480)
+            [2] Image(3,360,480)
+            ...
+            [599] Image(3,360,480)
+
+        y <SegmentationLabelList>
+            [0] ImageSegment(1,360,480)
+            [1] ImageSegment(1,360,480)
+            [2] ImageSegment(1,360,480)
+            ...
+            [599] ImageSegment(1,360,480)
+
+        path <PosixPath> (/root/.fastai/data/camvid/iamges)
+
+    train <LabelList> (101 items)
+        [0] (Image (3, 360, 480), ImageSegment (1, 360, 480))
+        [1] (Image (3, 360, 480), ImageSegment (1, 360, 480))
+        [2] (Image (3, 360, 480), ImageSegment (1, 360, 480))
+        ...
+        [100] (Image (3, 360, 480), ImageSegment (1, 360, 480))
+
+
+        x <SegmentationItemList>
+            [0] Image(3,360,480)
+            [1] Image(3,360,480)
+            [2] Image(3,360,480)
+            ...
+            [100] Image(3,360,480)
+
+        y <SegmentationLabelList>
+            [0] ImageSegment(1,360,480)
+            [1] ImageSegment(1,360,480)
+            [2] ImageSegment(1,360,480)
+            ...
+            [100] ImageSegment(1,360,480)
+
+        path <PosixPath> (/root/.fastai/data/camvid/iamges)
+
+# data = (src.transform(get_transforms(), size=size, tfm_y=True)
+        .databunch(bs=bs)
+        .normalize(imagenet_stats))
+
+data <ImageDataBunch>
+    dataset <LabelList> (600 items)
+        [0] (Image(3,360,480), ImageSegment(1,360,480)
+        [1] (Image(3,360,480), ImageSegment(1,360,480)
+        [2] (Image(3,360,480), ImageSegment(1,360,480)
+        ...
+        [599] (Image(3,360,480), ImageSegment(1,360,480)
+
+        x <ImageList> (323384 items)
+            [0] <Image> (Image(3,360,480)
+            [1] <Image> (Image(3,360,480)
+            ...
+            [599] <Image> (Image(3,360,480)
+
+        y <SegmentationLabelList> (600 items)
+            [0] <ImageSegment> (ImageSegment(1,360,480)
+            [1] <ImageSegment> (ImageSegment(1,360,480)
+            ...
+            [599] <ImageSegment> (ImageSegment(1,360,480)
+
+        path <PosixPath> (/root/.fastai/data/planet)
+
+    train_ds <LabelList> (600 items)
+        [0] (Image(3,360,480), ImageSegment(1,360,480)
+        [1] (Image(3,360,480), ImageSegment(1,360,480)
+        [2] (Image(3,360,480), ImageSegment(1,360,480)
+        ...
+        [599] (Image(3,360,480), ImageSegment(1,360,480)
+
+        x <ImageList> (600 items)
+            [0] <Image> (Image(3,360,480)
+            [1] <Image> (Image(3,360,480)
+            ...
+            [599] <Image> (Image(3,360,480)
+
+        y <SegmentationLabelList> (600 items)
+            [0] <ImageSegment> (ImageSegment(1,360,480)
+            [1] <ImageSegment> (ImageSegment(1,360,480)
+            ...
+            [599] <ImageSegment> (ImageSegment(1,360,480)
+
+        path <PosixPath> (/root/.fastai/data/planet)
+
+    fix_dl <DeviceDataLoader>
+        dataset <LabelList> (600 items)
+            [0] (Image(3,360,480), ImageSegment(1,360,480)
+            [1] (Image(3,360,480), ImageSegment(1,360,480)
+            [2] (Image(3,360,480), ImageSegment(1,360,480)
+            ...
+            [599] (Image(3,360,480), ImageSegment(1,360,480)
+
+            x <ImageList> (600 items)
+                [0] <Image> (Image(3,360,480)
+                [1] <Image> (Image(3,360,480)
+                ...
+                [599] <Image> (Image(3,360,480)
+
+            y <SegmentationLabelList> (600 items)
+                [0] <ImageSegment> (ImageSegment(1,360,480)
+                [1] <ImageSegment> (ImageSegment(1,360,480)
+                ...
+                [599] <ImageSegment> (ImageSegment(1,360,480)
+
+            path <PosixPath> (/root/.fastai/data/planet)
+
+
+    train_dl <DeviceDataLoader>
+        dataset <LabelList> (600 items)
+            [0] (Image(3,360,480), ImageSegment(1,360,480)
+            [1] (Image(3,360,480), ImageSegment(1,360,480)
+            [2] (Image(3,360,480), ImageSegment(1,360,480)
+            ...
+            [599] (Image(3,360,480), ImageSegment(1,360,480)
+
+            x <ImageList> (600 items)
+                [0] <Image> (Image(3,360,480)
+                [1] <Image> (Image(3,360,480)
+                ...
+                [599] <Image> (Image(3,360,480)
+
+            y <SegmentationLabelList> (600 items)
+                [0] <ImageSegment> (ImageSegment(1,360,480)
+                [1] <ImageSegment> (ImageSegment(1,360,480)
+                ...
+                [599] <ImageSegment> (ImageSegment(1,360,480)
+
+            path <PosixPath> (/root/.fastai/data/planet)
+
+    valid_ds <LabelList> (101)
+        [0] (Image(3,360,480), ImageSegment(1,360,480)
+        [1] (Image(3,360,480), ImageSegment(1,360,480)
+        [2] (Image(3,360,480), ImageSegment(1,360,480)
+        ...
+        [100] (Image(3,360,480), ImageSegment(1,360,480)
+
+        x <ImageList> (101 items)
+            [0] <Image> (Image(3,360,480)
+            [1] <Image> (Image(3,360,480)
+            ...
+            [100] <Image> (Image(3,360,480)
+
+        y <SegmentationLabelList> (101 items)
+            [0] <ImageSegment> (ImageSegment(1,360,480)
+            [1] <ImageSegment> (ImageSegment(1,360,480)
+            ...
+            [599] <ImageSegment> (ImageSegment(1,360,480)
+
+        path <PosixPath> (/root/.fastai/data/planet)
+
+    valid_dl <DeviceDataLoader>
+        dataset <LabelList> (101 items)
+            [0] (Image(3,360,480), ImageSegment(1,360,480)
+            [1] (Image(3,360,480), ImageSegment(1,360,480)
+            [2] (Image(3,360,480), ImageSegment(1,360,480)
+            ...
+            [101] (Image(3,360,480), ImageSegment(1,360,480)
+
+            x <ImageList> (101 items)
+                [0] <Image> (Image(3,360,480)
+                [1] <Image> (Image(3,360,480)
+                ...
+                [100] <Image> (Image(3,360,480)
+
+            y <SegmentationLabelList> (101 items)
+                [0] <ImageSegment> (ImageSegment(1,360,480)
+                [1] <ImageSegment> (ImageSegment(1,360,480)
+                ...
+                [100] <ImageSegment> (ImageSegment(1,360,480)
+
+            path <PosixPath> (/root/.fastai/data/planet)
+
+    # data.fix_dl.dataset[i] returns
+        FIXED TRANSFORM of (data.fix_dl.dataset.x[i], data.fix_dl.dataset.y[i])
+
+    # data.train_dl.dataset[i] returns
+        VARIABLE TRANSFORM of (data.train_dl.dataset.x[i], data.train_dl.dataset.y[i])
+
+
+'''
 
 # see the data image and label files for data
 fnames = get_image_files(path_img)
@@ -94,17 +305,6 @@ tensor([[[ 4,  4,  4,  ..., 21, 21, 21],
 mask.data[0].shape
 '''
 torch.Size([720, 960])
-'''
-
-mask.data[0]
-'''
-tensor([[ 4,  4,  4,  ..., 21, 21, 21],
-        [ 4,  4,  4,  ..., 21, 21, 21],
-        [ 4,  4,  4,  ..., 21, 21, 21],
-        ...,
-        [17, 17, 17,  ..., 17, 17, 17],
-        [17, 17, 17,  ..., 17, 17, 17],
-        [17, 17, 17,  ..., 17, 17, 17]])
 '''
 
 codes = np.loadtxt(path/'codes.txt', dtype=str)

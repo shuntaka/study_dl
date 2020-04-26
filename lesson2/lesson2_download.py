@@ -10,8 +10,6 @@ window.open('data:text/csv;charset=utf-8,' + escape(urls.join('\n')));
 !mv ./fast-ai-data/violin.csv ./data/instruments/
 '''
 
-
-# directory structure
 '''
 folder structure is below;
 /content    <= current directory
@@ -19,30 +17,34 @@ folder structure is below;
     /drive   
         /My\ Drive/Colab\ Notebooks/FastAI/data
             /download
+                /xxx.csv
                 
 /root/.fastai
     /data
         /download
+            /xxx.csv
 
+'''
+
+'''
+# mount Google Drive under /content/drive
+
+from google.colab import drive
+drive.mount('/content/drive')
+!ls drive/My\ Drive/Colab\ Notebooks/FastAI/data/download
+
+
+# copy /content/drive/.../data/download folder under /content/data/instruments
+!mkdir /root/.fastai
+!mkdir /root/.fastai/data
+!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/download /root/.fastai/data/
+!ls /root/.fastai/data/download
 '''
 
 # set path
 from fastai.vision import *
 from fastai import *
 path = Config.data_path()/'download'
-
-# mount Google Drive under /content/drive
-'''
-from google.colab import drive
-drive.mount('/content/drive')
-!ls drive/My\ Drive/Colab\ Notebooks/FastAI/data/download
-'''
-
-# copy /content/drive/.../data/download folder under /content/data/instruments
-'''
-!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/download /root/.fastai/data/
-!ls /root/.fastai/data/download
-'''
 
 
 # download images for violin
@@ -87,10 +89,12 @@ learn = cnn_learner(data, models.resnet34, metrics=error_rate)
 learn.fit_one_cycle(4)
 learn.save('stage-1')
 
-# train model stage2
+# train model stage2 - find learning rate
 learn.unfreeze()
 learn.lr_find()
 learn.recorder.plot()
+
+# train model stage2 - fit
 learn.fit_one_cycle(4, max_lr=slice(1e-4, 3e-3))
 learn.save('stage-2')
 
@@ -104,8 +108,13 @@ interp.plot_top_losses(10)
 learn.export()  # this will create 'export.pkl' in the directory
 
 # inference
+!cp drive/My\ Drive/Colab\ Notebooks/FastAI/data/download/viola_test / root/.fastai/data/download
 img = open_image(path/'violin'/'someimage.jpg')
 learn = load_learner(path)  # path is where export.pkl sits
 
 pred_class, pred_idx, outputs = learn.predict(img)
 pred_class
+
+'''
+practice1
+'''

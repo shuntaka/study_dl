@@ -8,6 +8,80 @@
 %matplotlib inline
 '''
 
+'''
+# directory
+/root/.fastai
+    /data
+        /oxford-iiit-pet
+            /images
+
+'''
+
+'''
+# data = ImageDataBunch.from_name_re(
+    path_img, fnames, pat, ds_tfms=get_transforms(), size=224, bs=bs
+    ) .normalize(imagenet_stats)
+
+data <ImageDataBunch>
+    dataset <LabelList> (5912 items)
+        x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), ...)
+
+        y <CategoryList> (5912 items) (Sphynx, Persian, beagle, Egyptian, Mau, pomeranian) 
+
+        path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+
+    train_ds <LabelList> (5912 items)
+        x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), ...)
+
+        y <CategoryList> (5912 items) (Sphynx, Persian, beagle, Egyptian, Mau, pomeranian) 
+
+        path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+
+    valid_ds <LabelList> (1478 items)
+        x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), Image(3, 224, 224), ...)
+
+        y <CategoryList> (keeshond, amerian_pit_bull_terrier, german_)
+
+        path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+
+    fix_dl <DeviceDataLoader>
+        dataset <LabelList> (5912 items)
+            x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), ...)
+
+            y <CategoryList> (5912 items) (Sphynx, Persian, beagle, Egyptian, Mau, pomeranian) 
+
+            path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+
+    train_dl <DeviceDataLoader>
+        dataset <LabelList> (5912 items)
+            x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), ...)
+
+            y <CategoryList> (5912 items) (Sphynx, Persian, beagle, Egyptian, Mau, pomeranian) 
+
+            path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+    
+    valid_dl <DeviceDataLoader>
+        dataset <LabelList> (1478 items)
+            x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), Image(3, 224, 224), ...)
+
+            y <CategoryList> (keeshond, amerian_pit_bull_terrier, german_)
+
+            path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+        
+# data.dataset.x[i] === data.fix_dl.dataset.x[i] === data.train_dl.dataset.x[i]
+
+# data.dataset[i] returns a tuple;
+VARIABLE-TRANSFORMED version of (data.dataset.x[i], data.dataset.y[i]) 
+
+
+# data.fix_dl.dataset[i] returns a tuple;
+FIXED-TRANSFORMED version of (data.fix_dl.dataset.x[i], data.fix_dl.dataset.y[i])
+
+
+# data.train_dl.dataset[0] returns a tuple;
+VARIABLE-TRANSFORMED version of (data.train_dl.dataset.x[i], data.train_dl.dataset.y[i])
+
+'''
 from fastai.vision import *
 from fastai.metrics import error_rate
 bs = 64
@@ -20,14 +94,6 @@ PosixPath('/root/.fastai/data/oxford-iiit-pet')
 path_anno = path/'annotations'
 path_img = path/'images'
 
-# directory structure
-'''
-/root/.fastai
-    /data
-        /oxford-iiit-pet
-            /images
-
-'''
 
 fnames = get_iamge_files(path_img)
 '''
@@ -118,6 +184,42 @@ fn_paths[:2]
 data = ImageDataBunch.from_name_func(path, fn_paths, ds_tfms=tfms, size=24,
                                      label_func=lambda x: '3' if '/3/' in str(x) else '7')
 
-########################
-# practice
-########################
+'''
+practice1
+'''
+
+bs = 64
+path = untar_data(URLs.PETS)
+
+path_anno = path/'annotations'
+path_img = path/'images'
+
+fnames = get_image_files(path_img)
+
+np.random.seed(2)
+pat = r'/([^/]+)_\d.jpg$'
+
+data = ImageDataBunch.from_name_re(
+    path_img, fnames, pat, ds_tfms=get_transforms(), size=224, bs=bs
+).normalize(imagenet_stats)
+
+data.show_batch(rows=3, figsize=(7, 6))
+learn = cnn_learner(data, models, resnet34, metrics=error_rate)
+learn.fit_one_cycle(4)
+
+learn.save('stage-1')
+interp = ClassificationInterpretation.from_learner(learner)
+
+losses, idxs = interp.top_losses()
+len(data.valid_ds) == len(losses) == len(idxs)
+
+interp.plot_top_losses(9, figsize=(15, 11))
+interp.plot_confusion_matrix(figsize=(12, 12), dpi=60)
+interp.most_confused(min_val=2)
+
+learn.unfreeze()
+learn.fit_one_cycle(1)
+
+learn.load('stage-1')
+learn.lr_find()
+learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-4))

@@ -3,18 +3,6 @@
 !curl https: // course.fast.ai/setup/colab | bash
 '''
 
-# load additional dependencies at the top
-from fastai.vision import *
-from google.colab import drive
-
-'''
-%reload_ext autoreload
-%autoreload 2
-%matplotlib inline
-'''
-
-# manually download the dataset to Notebooks/FastAI/data/planet at Google Drive from Kaggle
-
 # directory structure
 '''
 folder structure is below:
@@ -22,19 +10,189 @@ folder structure is below:
     /drive
         /My\ Drive/Colab\ Notebooks/FastAI/data
             /planet
+                /train_v2.csv
+                /train-jpg.tar.7z
+
 
 /root
     /.fastai
         /data
-            /planet
+            /planet                 <== path
+                /train_v2.csv
                 /train-jpg.tar.7z
+                /train-jpg/
+                    /train_1.jpg
+                    /train_2.jpg
+                    ...
+                    /train_37324.jpg
+
+
 '''
 
+'''
+# src = (ImageList.from_csv(path, 'train_v2.csv', folder='train-jpg', suffix='.jpg')
+        .split_by_rand_pct(0.2)
+        .label_from_df(label_delim=' ')
 
-# configure data path
-path = Config.data_path()/'planet'
+src <LabelLists>
+    train <LabelList> (32384 items)
+        [0] (Image(3,256,256), MultiCategory(haze;primary))
+        [1] (Image(3,256,256), MultiCategory(clear;primary))
+        ...
+        [32383](Image(3,256,256), MultiCategory(agriculture;cultivation;partly_cloudy;primary))
 
-# mount google drive and copy manually downloaded data(uncomment to use)
+        x <ImageList> (323384 items)
+            [0] <Image> (Image(3,256,256)
+            [1] <Image> (Image(3,256,256)
+            ...
+            [32383] <Image> (Image(3,256,256)
+
+        y <MultiCateogryList> (32384 items)
+            [0] <MultiCategory> (haze;primary)
+            [1] <MultiCategory> (clear;primary)
+            ...
+            [32383] <MultiCategory> (agriculture;cultivation;partly_cloudy;primary)
+
+        path <PosixPath> (/root/.fastai/data/planet)
+
+    valid <LabelList> (8095 items)
+        [0] (Image(3,256,256), MultiCategory(clear;primary;road))
+        [1] (Image(3,256,256), MultiCategory(primary;water))
+        ...
+        [8094](Image(3,256,256), MultiCategory(agriculture;clear;primary;road)
+
+        x <ImageList>
+            [0] <Image> (Image(3,256,256)
+            [1] <Image> (Image(3,256,256)
+            ...
+            [8094] <Image> (Image(3,256,256)
+
+        y <MultiCategoryList>
+            [0] <MultiCategory> (clear;primary;road)
+            [1] <MultiCategory> (clear;primary;water)
+            ...
+            [8094] <MultiCategory> (agriculture;clear;primary;road)
+
+
+# data = (src.transform(tfms, size=128)
+            .databunch().normalize(imagenet_stats))
+
+variables = [i for i in dir(data) if not callable(i)]
+
+
+data <ImageDataBunch>
+    dataset <LabelList> (32384 items)
+        [0] (Image(3,256,256), MultiCategory(haze;primary))
+        [1] (Image(3,256,256), MultiCategory(clear;primary))
+        ...
+        [32383](Image(3,256,256), MultiCategory(agriculture;cultivation;partly_cloudy;primary))
+
+        x <ImageList> (323384 items)
+            [0] <Image> (Image(3,256,256)
+            [1] <Image> (Image(3,256,256)
+            ...
+            [32383] <Image> (Image(3,256,256)
+
+        y <MultiCateogryList> (32384 items)
+            [0] <MultiCategory> (haze;primary)
+            [1] <MultiCategory> (clear;primary)
+            ...
+            [32383] <MultiCategory> (agriculture;cultivation;partly_cloudy;primary)
+
+        path <PosixPath> (/root/.fastai/data/planet)
+
+    train <LabelList> (32384 items)
+        [0] (Image(3,256,256), MultiCategory(haze;primary))
+        [1] (Image(3,256,256), MultiCategory(clear;primary))
+        ...
+        [32383](Image(3,256,256), MultiCategory(agriculture;cultivation;partly_cloudy;primary))
+
+        x <ImageList> (323384 items)
+            [0] <Image> (Image(3,256,256)
+            [1] <Image> (Image(3,256,256)
+            ...
+            [32383] <Image> (Image(3,256,256)
+
+        y <MultiCateogryList> (32384 items)
+            [0] <MultiCategory> (haze;primary)
+            [1] <MultiCategory> (clear;primary)
+            ...
+            [32383] <MultiCategory> (agriculture;cultivation;partly_cloudy;primary)
+
+        path <PosixPath> (/root/.fastai/data/planet)
+
+    train_ds <LabelList> (32384 items)
+        [0] (Image(3,256,256), MultiCategory(haze;primary))
+        [1] (Image(3,256,256), MultiCategory(clear;primary))
+        ...
+        [32383](Image(3,256,256), MultiCategory(agriculture;cultivation;partly_cloudy;primary))
+
+        x <ImageList> (323384 items)
+            [0] <Image> (Image(3,256,256)
+            [1] <Image> (Image(3,256,256)
+            ...
+            [32383] <Image> (Image(3,256,256)
+
+        y <MultiCateogryList> (32384 items)
+            [0] <MultiCategory> (haze;primary)
+            [1] <MultiCategory> (clear;primary)
+            ...
+            [32383] <MultiCategory> (agriculture;cultivation;partly_cloudy;primary)
+
+        path <PosixPath> (/root/.fastai/data/planet)
+
+    train_dl <DeviceDataLoader>
+        dataset <LabelList> (32384 items)
+            [0] (Image(3,256,256), MultiCategory(haze;primary))
+            [1] (Image(3,256,256), MultiCategory(clear;primary))
+            ...
+            [32383](Image(3,256,256), MultiCategory(agriculture;cultivation;partly_cloudy;primary))
+
+            x <ImageList> (323384 items)
+                [0] <Image> (Image(3,256,256)
+                [1] <Image> (Image(3,256,256)
+                ...
+                [32383] <Image> (Image(3,256,256)
+
+            y <MultiCateogryList> (32384 items)
+                [0] <MultiCategory> (haze;primary)
+                [1] <MultiCategory> (clear;primary)
+                ...
+                [32383] <MultiCategory> (agriculture;cultivation;partly_cloudy;primary)
+
+            path <PosixPath> (/root/.fastai/data/planet)
+
+    # data.train_dl.dataset[0] returns
+        VARIABLE TRANSFORM of (Image(3,128,128), MultiCategory(...))
+
+    # data.fix_dl.dataset[0] returns
+        FIXED TRANSFORM of (Image(3,128,128), MultiCategory(...))
+
+
+
+    valid <LabelList> (8095 items)
+        [0] (Image(3,256,256), MultiCategory(clear;primary;road))
+        [1] (Image(3,256,256), MultiCategory(primary;water))
+        ...
+        [8094](Image(3,256,256), MultiCategory(agriculture;clear;primary;road)
+
+        x <ImageList>
+            [0] <Image> (Image(3,256,256)
+            [1] <Image> (Image(3,256,256)
+            ...
+            [8094] <Image> (Image(3,256,256)
+
+        y <MultiCategoryList>
+            [0] <MultiCategory> (clear;primary;road)
+            [1] <MultiCategory> (clear;primary;water)
+            ...
+            [8094] <MultiCategory> (agriculture;clear;primary;road)
+
+
+
+'''
+
+# mount google drive and copy manually downloaded data
 '''
 from google.colab import drive
 drive.mount('/content/drive')
@@ -43,10 +201,11 @@ drive.mount('/content/drive')
 
 # copy the data
 '''
+!mkdir /root/.fastai
+!mkdir /root/.fastai/data
 !cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/planet /root/.fastai/data/
 !ls /root/.fastai/data/planet
 '''
-
 
 # SKIP THIS
 # configure kaggle credential & download data set
@@ -57,6 +216,19 @@ drive.mount('/content/drive')
 ! mv kaggle.json ~/.kaggle/
 ! kaggle competitions download - c planet-understanding-the-amazon-from-space - p {path}
 '''
+
+# load additional dependencies at the top
+'''
+%reload_ext autoreload
+%autoreload 2
+%matplotlib inline
+'''
+
+
+# configure data path
+from fastai.vision import *
+path = Config.data_path()/'planet'
+
 
 # unzip the dataset. remove unnecessary spaces before pasting
 '''
@@ -76,6 +248,7 @@ drive.mount('/content/drive')
 # see the labels
 # path: PosixPath('/root/.fastai/data/planet)
 df = pd.read_csv(path/'train_v2.csv')
+df.head()
 
 # transforms
 tfms = get_transforms(flip_vert=True, max_lighting=0.1,
@@ -85,21 +258,13 @@ tfms = get_transforms(flip_vert=True, max_lighting=0.1,
 # create data
 #
 
-# path
-path = Config.data_path()/'planet'
-path.mkdir(parents=True, exist_ok=True)
 
 # specifying the source for dataset
 # by specifying the location of images, labels, and ratio of validation set
 np.random.seed(42)
-src = (ImageList.from_csv(
-    path,
-    'train_v2.csv',
-    folder='train-jpg',
-    suffix='.jpg'
-)
-    .split_by_rand_pct(0.2)
-    .label_from_df(label_delim=' '))
+src = (ImageList.from_csv(path, 'train_v2.csv', folder='train-jpg', suffix='.jpg')
+        .split_by_rand_pct(0.2)
+        .label_from_df(label_delim=' '))
 
 '''
  (1)with datasets(),
@@ -113,8 +278,7 @@ src = (ImageList.from_csv(
  combined one is callled databunch)
 '''
 
-data = (src.datasets()
-        .transform(tfms, size=128)
+data = (src.transform(tfms, size=128)
         .databunch().normalize(imagenet_stats))
 
 # see the input
