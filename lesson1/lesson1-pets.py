@@ -14,6 +14,11 @@
     /data
         /oxford-iiit-pet
             /images
+                /staffordshire_bull_terrier_114.jpg
+                /saint_bernard_188.jpg
+                /Persian_144.jpg
+                /Maine_Coon_268.jpg
+                /newfoundland_95.jpg
 
 '''
 
@@ -87,22 +92,12 @@ from fastai.metrics import error_rate
 bs = 64
 
 path = untar_data(URLs.PETS)
-'''
-PosixPath('/root/.fastai/data/oxford-iiit-pet')
-'''
 
 path_anno = path/'annotations'
 path_img = path/'images'
 
 
 fnames = get_iamge_files(path_img)
-'''
- PosixPath('/root/.fastai/data/oxford-iiit-pet/images/staffordshire_bull_terrier_114.jpg'),
-[PosixPath('/root/.fastai/data/oxford-iiit-pet/images/saint_bernard_188.jpg'),
- PosixPath('/root/.fastai/data/oxford-iiit-pet/images/Persian_144.jpg'),
- PosixPath('/root/.fastai/data/oxford-iiit-pet/images/Maine_Coon_268.jpg'),
- PosixPath('/root/.fastai/data/oxford-iiit-pet/images/newfoundland_95.jpg')]
-'''
 
 np.random.seed(2)
 pat = r'/([^/]+)_\d.jpg$'

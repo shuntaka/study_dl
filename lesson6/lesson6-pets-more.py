@@ -3,121 +3,11 @@
 !curl https: // course.fast.ai/setup/colab | bash
 '''
 
-# matplot
+
+# model
 '''
-%matplotlib inline
-%reload_ext autoreload
-%autoreload 2
-%matplotlib inline
-'''
+# learn.model
 
-
-from fastai.callbacks.hooks import *
-from fastai.vision import *
-bs = 64
-path = untar_data(URLs.PETS)/'images'
-
-tfms = get_transforms(max_rotate=20, max_zoom=1.3, max_lighting=0.4, max_warp=0.4
-                      p_affine=1., p_lighting=1.)
-
-src = ImageList.from_folder(path).split_by_rand_pct(0.2, seed=2)
-
-
-def get_data(size, bs, padding_mode='reflection'):
-    return (src.label_from_re(r'([^/]+)_\d+.jpg$')
-            .transform(tfms, size=size, padding_mode=padding_mode)
-            .databunch(bs=bs).normalize(imagenet_stats))
-
-
-#
-data = get_data(224, bs, 'zeros')
-
-
-def _plot(i, j, ax):
-    x, y = data.train_ds[3]
-    x.show(ax, y=y)
-
-
-plot_multi(_plot, 3, 3, figsize=(8, 8))
-
-#
-data = get_data(224, bs)
-plot_multi(_plot, 3, 3, figsize=(8, 8))
-
-gc.collect()
-learn = cnn_learner(data, models.resnet34, metrics=error_rate, bn_final=True)
-learn.fit_one_cycle(3, slice(1e-2), pct_start=0.8)
-
-#
-learn.unfreeze()
-learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-3), pct_start=0.8)
-
-#
-data = get_data(352, bs)
-learn.data = data
-learn.save('352')
-
-#
-data = get_data(352, 16)
-learn = cnn_learner(data, models.resnet34,
-                    metrics=error_rate, bn_final=True).load('352')
-
-idx = 0
-x, y = data.valid_ds[idx]
-x.show()
-data.valid_ds.y[idx]
-
-# kernel
-k = tensor([
-    [0.,  -5/3, 1],
-    [-5/3, -5/3, 1],
-    [1., 1, 1],
-]).expand(1, 3, 3, 3)/6
-
-k
-'''
-tensor([[[[ 0.0000, -0.2778,  0.1667],
-          [-0.2778, -0.2778,  0.1667],
-          [ 0.1667,  0.1667,  0.1667]],
-
-         [[ 0.0000, -0.2778,  0.1667],
-          [-0.2778, -0.2778,  0.1667],
-          [ 0.1667,  0.1667,  0.1667]],
-
-         [[ 0.0000, -0.2778,  0.1667],
-          [-0.2778, -0.2778,  0.1667],
-          [ 0.1667,  0.1667,  0.1667]]]])
-'''
-
-k.shape
-'''
-torch.Size([1,3,3,3])
-'''
-
-# a image
-t = data.valid_ds[0][0].data
-t.shape
-'''
-torch.Size([3,352,352])
-'''
-
-t[None].shape
-'''
-torch.Size([1, 3, 352, 352])
-'''
-
-# convoluted image
-edge = F.conv2d(t[None], k)
-
-show_image(edge[0], figsize=(5, 5))
-
-data.c
-'''
-37
-'''
-
-learn.model
-'''
 Sequential(
   (0): Sequential(
     (0): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
@@ -275,8 +165,7 @@ Sequential(
 )
 '''
 
-print(learn.summary)
-
+# learn summary
 '''
 - number of parameters = 
     {kernel height x kernel width x kenel depth}
@@ -495,6 +384,125 @@ Total params: 21,831,599
 Total trainable params: 563,951
 Total non-trainable params: 21,267,648
 '''
+from fastai.vision import *
+from fastai.callbacks.hooks import *
+print(learn.summary)
+
+
+# matplot
+'''
+%matplotlib inline
+%reload_ext autoreload
+%autoreload 2
+%matplotlib inline
+'''
+
+
+bs = 64
+path = untar_data(URLs.PETS)/'images'
+
+tfms = get_transforms(max_rotate=20, max_zoom=1.3, max_lighting=0.4, max_warp=0.4
+                      p_affine=1., p_lighting=1.)
+
+src = ImageList.from_folder(path).split_by_rand_pct(0.2, seed=2)
+
+
+def get_data(size, bs, padding_mode='reflection'):
+    return (src.label_from_re(r'([^/]+)_\d+.jpg$')
+            .transform(tfms, size=size, padding_mode=padding_mode)
+            .databunch(bs=bs).normalize(imagenet_stats))
+
+
+#
+data = get_data(224, bs, 'zeros')
+
+
+def _plot(i, j, ax):
+    x, y = data.train_ds[3]
+    x.show(ax, y=y)
+
+
+plot_multi(_plot, 3, 3, figsize=(8, 8))
+
+#
+data = get_data(224, bs)
+plot_multi(_plot, 3, 3, figsize=(8, 8))
+
+gc.collect()
+learn = cnn_learner(data, models.resnet34, metrics=error_rate, bn_final=True)
+learn.fit_one_cycle(3, slice(1e-2), pct_start=0.8)
+
+#
+learn.unfreeze()
+learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-3), pct_start=0.8)
+
+#
+data = get_data(352, bs)
+learn.data = data
+learn.save('352')
+
+#
+data = get_data(352, 16)
+learn = cnn_learner(data, models.resnet34,
+                    metrics=error_rate, bn_final=True).load('352')
+
+idx = 0
+x, y = data.valid_ds[idx]
+x.show()
+data.valid_ds.y[idx]
+
+# kernel
+k = tensor([
+    [0.,  -5/3, 1],
+    [-5/3, -5/3, 1],
+    [1., 1, 1],
+]).expand(1, 3, 3, 3)/6
+
+k
+'''
+tensor([[[[ 0.0000, -0.2778,  0.1667],
+          [-0.2778, -0.2778,  0.1667],
+          [ 0.1667,  0.1667,  0.1667]],
+
+         [[ 0.0000, -0.2778,  0.1667],
+          [-0.2778, -0.2778,  0.1667],
+          [ 0.1667,  0.1667,  0.1667]],
+
+         [[ 0.0000, -0.2778,  0.1667],
+          [-0.2778, -0.2778,  0.1667],
+          [ 0.1667,  0.1667,  0.1667]]]])
+'''
+
+k.shape
+'''
+torch.Size([1,3,3,3])
+'''
+
+# a image
+t = data.valid_ds[0][0].data
+t.shape
+'''
+torch.Size([3,352,352])
+'''
+
+t[None].shape
+'''
+torch.Size([1, 3, 352, 352])
+'''
+
+# convoluted image
+edge = F.conv2d(t[None], k)
+
+show_image(edge[0], figsize=(5, 5))
+
+data.c
+'''
+37
+'''
+
+learn.model
+
+print(learn.summary)
 
 m = learn.model.eval()
 xb, _ = data.one_item(x)

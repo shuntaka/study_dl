@@ -3,6 +3,351 @@
 !curl https: // course.fast.ai/setup/colab | bash
 '''
 
+# directory structure
+'''
+/root/.fastai
+        /data
+                /imdb
+                        /train
+                                /neg
+                                /pos
+                        /test
+                                /neg
+                                /pos
+                        /unsup
+                                /neg
+                                /pos
+'''
+
+'''
+# data_lm = TextDataBunch.from_csv(path, 'texts.csv')
+data_lm <TextClassDataBunch>
+        train_ds <LabelList> (799 items)
+                [0] (<Text> xxbos xxmaj will xxmah..., <Category> positive)
+                [1] (<Text> xxbos xxmaj it seems...,   <Category> negative)
+                ...
+                [798] (<Text> xxbos " xxmaj national xxmaj..., <Category> negative)
+
+                x <TextList> (799 items)
+                        [0] (<Text> xxbos xxmaj will xxmah...,)
+                        [1] (<Text> xxbos xxmaj it seems...,  )
+                        ...
+                        [798] (<Text> xxbos " xxmaj national xxmaj...,)
+
+                y <CategoryList> (799 items)
+                        [0] (<Category> positive)
+                        [1] (<Category> negative)
+                        ...
+                        [798] (<Category> positive)
+
+        valid_ds <LabelList> (201 items)
+                [0] (<Text> xxbos xxmaj this is..., <Category> negative)
+                [1] (<Text> xxbos i have...,   <Category> negative)
+                ...
+                [200] (<Text> xxbos xxmaj if ..., <Category> positive)
+
+                x <TextList> (201 items)
+                        [0] (<Text> xxbos xxmaj this is...)
+                        [1] (<Text> xxbos i have...   )
+                        ...
+                        [200] (<Text> xxbos xxmaj if )
+
+                y <CategoryList> (201 items)
+                        [0] (<Category> negative)
+                        [1] (<Category> negative)
+                        ...
+                        [200] (<Category> positive)
+
+
+# data = TextClassDataBunch.from_csv(path, 'texts.csv')
+data <TextClassDataBunch>
+        train_ds <LabelList> (799 items)
+                [0] (<Text> xxbos xxmaj kim xxmaj..., <Category> negative)
+                        [0] <Text> xxbos xxmaj kim xxmaj
+                                data <array> [2, 5, 2173, 5, ...]
+
+                [1] (<Text> xxbos xxmaj excellent view...,   <Category> positive)
+                ...
+                [798] (<Text> xxbos i came ..., <Category> negative)
+
+                x <TextList> (799 items)
+                        [0] (<Text> xxbos xxmaj kim xxmaj..., <Category> negative)
+                        [1] (<Text> xxbos xxmaj excellent view...,   <Category> positive)
+                        ...
+                        [798] (<Text> xxbos i came ..., <Category> negative)
+
+                y <CategoryList> (799 items)
+                        [0] (<Category> negative)
+                        [1] (<Category> positive)
+                        ...
+                        [798] (<Category> negative)
+
+        valid_ds <LabelList> (201 items)
+                [0] (<Text> xxbos xxmaj the year..., <Category> positive)
+                [1] (<Text> xxbos i found...,   <Category> negative)
+                ...
+                [200] (<Text> xxbos xxmaj oh ..., <Category> negative)
+
+                x <TextList> (201 items)
+                        [0] (<Text> xxbos xxmaj the year...)
+                        [1] (<Text> xxbos i found...   )
+                        ...
+                        [200] (<Text> xxbos xxmaj oh... )
+
+                y <CategoryList> (201 items)
+                        [0] (<Category> positive)
+                        [1] (<Category> negative)
+                        ...
+                        [200] (<Category> negative)
+
+# data = TextList.from_csv(path, 'texts.csv', cols='text')
+                .split_from_df(col=2)
+                .label_from_df(cols=0)
+                .databunch())
+
+data <TextClassDataBunch>
+        train_ds <LabelList> (800 items)
+                [0] (<Text> xxbos xxmaj un - xxunk -..., <Category> negative)
+                        [0] (<Text> xxbos xxmaj un - xxunk -..., )
+                                data <array> [2, 5, 4619, ...]
+
+                [1] (<Text> xxbos xxmaj this is...,   <Category> positive)
+                ...
+                [799] (<Text> xxbos i do n't ..., <Category> negative)
+
+                x <TextList> (800 items)
+                        [0] (<Text> xxbos xxmaj un - xxunk -..., <Category> negative)
+                                [0] (<Text> xxbos xxmaj un - xxunk -..., )
+                                        data <array> [2, 5, 4619, ...]
+
+                        [1] (<Text> xxbos xxmaj this is...,   <Category> positive)
+                        ...
+                        [799] (<Text> xxbos i do n't ..., <Category> negative)
+
+                y <CategoryList> (800 items)
+                        [0] (<Category> negative)
+                        [1] (<Category> positive)
+                        ...
+                        [798] (<Category> negative)
+
+        valid_ds <LabelList> (200 items)
+                [0] (<Text> xxbos xxmaj this very..., <Category> positive)
+                [1] (<Text> xxbos i saw...,   <Category> positive)
+                ...
+                [199] (<Text> xxbos a compelling ..., <Category> positive)
+
+                x <TextList> (200 items)
+                        [0] (<Text> xxbos xxmaj this very..., <Category> positive)
+                        [1] (<Text> xxbos i saw...,   <Category> positive)
+                        ...
+                        [199] (<Text> xxbos a compelling ..., <Category> positive)
+
+                y <CategoryList> (200 items)
+                        [0] (<Category> positive)
+                        [1] (<Category> positive)
+                        ...
+                        [200] (<Category> positive)
+
+# data_lm = TextList.from_folder(path)
+                .filte_by_folder(include=['train', 'test', 'unsup'])
+                .split_by_rand_pct(0.1)
+                .label_for_lm()
+                .databunch(bs=bs))
+
+data_lm <TextLMDataBunch>
+        train_ds (90000 items)
+                [0]
+                [1]
+                ...
+                [89999]
+
+                x <LMTextList>
+
+                y <LMLabelList>
+
+                path <PosixPath> /root/.fastai/data/imdb
+
+        valid_ds (10000 items)
+
+# data_lm = (TextList.from_folder(path)
+                .filter_by_folder(include=['train, 'test', unsup']))
+                .split_by_rand_pct(0.1)
+                .label_for_lm()
+                .databunch(bs=bs))
+
+data <TextLMDataBunch>
+        train_ds <LabelList> (90000 items)
+                [0] (<Text> xxbos just wathed..., <EmptyLabel>)
+                [1](<Text> xxbos xxmaj peter xxmaj..., <EmptyLabel>)
+                ...
+                [89999] (<Text> xxbos i have..., <EmptyLabel>)
+
+                x <LMTextList> (90000 items)
+                        [0] (<Text> xxbos just wathed...,)
+                                data <array> (175) [2, 58, ..., 51]
+
+                        [1](<Text> xxbos xxmaj peter xxmaj...,)
+                                data <array> (419) [2, 5, ..., 10]
+
+                        [89999] (<Text> xxbos i have..., )
+                                data <array> (214) [2, 19, ..., 34]
+
+               y <LMLabelList> (90000 items)
+                        [0] <EmptyLabel>
+                        [1] <EmptyLabel>
+                        ...
+                        [89999] <EmptyLabel>
+
+               path <PosixPath> /root/.fastai/data/imdb;
+
+
+        valid_ds <LabelList> (10000 items)
+                [0] (<Text> xxbos xxma this..., <EmptyLabel>)
+                [1](<Text> xxbos xxmaj this ..., <EmptyLabel>)
+                ...
+                [9999] (<Text> xxbos xxmaj this..., <EmptyLabel>)
+
+                x <LMTextList> (10000 items)
+                        [0] (<Text> xxbos xxmaj this...,)
+                                data <array> (397) [2, 5, ..., 10]
+
+                        [1](<Text> xxbos xxmaj this...,)
+                                data <array> (157) [2, 5, ..., 94]
+
+                        [9999] (<Text> xxbos xxmaj this..., )
+                                data <array> (290) [2, 5, ..., 10]
+
+               y <LMLabelList> (10000 items)
+                        [0] <EmptyLabel>
+                        [1] <EmptyLabel>
+                        ...
+                        [9999] <EmptyLabel>
+
+               path <PosixPath> /root/.fastai/data/imdb;
+
+        fix_dl
+
+        train_dl <DeviceDataLoadet>
+                dataset <LanguageModelPreLoader>
+                        dataset <LabelList> (90000 items)
+                                [0] (<Text> xxbos just wathed..., <EmptyLabel>)
+                                [1](<Text> xxbos xxmaj peter xxmaj..., <EmptyLabel>)
+                                ...
+                                [89999] (<Text> xxbos i have..., <EmptyLabel>)
+
+                                x <LMTextList> (90000 items)
+                                        [0] (<Text> xxbos just wathed...,)
+                                                data <array 175> [2, 58, ..., 51]
+
+                                        [1](<Text> xxbos xxmaj peter xxmaj...,)
+                                                data <array 419> [2, 5, ..., 10]
+
+                                        [89999] (<Text> xxbos i have..., )
+                                                data <array 214> [2, 19, ..., 34]
+
+                                y <LMLabelList> (90000 items)
+                                        [0] <EmptyLabel>
+                                        [1] <EmptyLabel>
+                                        ...
+                                        [89999] <EmptyLabel>
+
+                                path <PosixPath> /root/.fastai/data/imdb;
+
+
+                        x <LMTextList> (90000 items)
+                                [0] (<Text> xxbos just wathed...,)
+                                        data <array 175> [2, 58, ..., 51]
+
+                                [1](<Text> xxbos xxmaj peter xxmaj...,)
+                                        data <array 419> [2, 5, ..., 10]
+
+                                [89999] (<Text> xxbos i have..., )
+                                        data <array 214> [2, 19, ..., 34]
+
+                        y <LMLabelList> (90000 items)
+                                [0] <EmptyLabel>
+                                [1] <EmptyLabel>
+                                ...
+                                [89999] <EmptyLabel>
+
+                        path <PosixPath> /root/.fastai/data/imdb;
+
+                        lengths <array> [175, 419, 218, 858, ]
+
+                        bs: 48
+
+                        bptt: 70
+
+                        backwards: False
+
+                        shuffle: True
+
+        valid_dl <DeviceDataLoader>
+                dataset <LanguageModelPreLoader>
+                        dataset <LabelList> (10000 items)
+                                [0] (<Text> xxbos xxma this..., <EmptyLabel>)
+                                [1](<Text> xxbos xxmaj this ..., <EmptyLabel>)
+                                ...
+                                [9999] (<Text> xxbos xxmaj this..., <EmptyLabel>)
+
+                                x <LMTextList> (10000 items)
+                                        [0] (<Text> xxbos xxmaj this...,)
+                                                data <array 397> [2, 5, ..., 10]
+
+                                        [1](<Text> xxbos xxmaj this...,)
+                                                data <array 157> [2, 5, ..., 94]
+
+                                        [9999] (<Text> xxbos xxmaj this..., )
+                                                data <array 290> [2, 5, ..., 10]
+
+                               y <LMLabelList> (10000 items)
+                                        [0] <EmptyLabel>
+                                        [1] <EmptyLabel>
+                                        ...
+                                        [9999] <EmptyLabel>
+
+                               path <PosixPath> /root/.fastai/data/imdb;
+
+                        x <LMTextList> (10000 items)
+                                [0] (<Text> xxbos xxmaj this...,)
+                                        data <array 397> [2, 5, ..., 10]
+
+                                [1](<Text> xxbos xxmaj this...,)
+                                        data <array 157> [2, 5, ..., 94]
+
+                                [9999] (<Text> xxbos xxmaj this..., )
+                                        data <array 290> [2, 5, ..., 10]
+
+                        y <LMLabelList> (10000 items)
+                                [0] <EmptyLabel>
+                                [1] <EmptyLabel>
+                                ...
+                                [9999] <EmptyLabel>
+
+                        bs: 48
+
+                        bptt: 70
+
+                        backwards: False
+
+                        shuffle: True
+
+
+# data_lm.fix_dl.dataset[i] returns a tupple
+  (data_lm.fix_dl.dataset.x[j].data[l:l+69],
+   data_lm.fix_dl.dataset.x[j].data[l+1:l+70])
+
+   where 'j' is picked up randomly
+
+(<array 70> [  2,  58, 325,  17, ...,   9, 462,  27],
+ <array 70> [ 58, 325,  17,  35, ..., 462,  27,  91])
+
+ # fix_dl returns a FIXED TRANSFORM version of dataset
+ # whereas train_dl returns a VARIABLE TRANSFORM version of dataset
+
+
+'''
+
 # install dependency
 '''
 %reload_ext autoreload
@@ -126,18 +471,6 @@ text_list.inner_df
 
 bs = 48
 
-
-# directory structure
-'''
-/root/.fastai
-        /data
-                /imdb
-                        /train
-                                /neg
-                                /pos
-                        /test
-                        /unsup
-'''
 
 # getting data
 path = untar_data(URLs.IMDB)

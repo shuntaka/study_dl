@@ -134,6 +134,13 @@ data <TextLMDataBunch>
                         [280600] e
                     data <array> (50079) ([2, 12, 9, 13,...])
 
+                [1] <Text> 
+                    text <Str>
+                        [0]
+                        [1]
+                ...
+
+
                 path <PosixPath> ('/root/.fastai/data/human_numbers')
 
             y <LMLabelList>
@@ -463,7 +470,7 @@ class Model2(nn.Module):
         return torch.stack(res, dim=1)
 
 
-learn = Leaner(data, Model2(), metrics=accuracy)
+learn = Learner(data, Model2(), metrics=accuracy)
 learn.fit_one_cycle(10, 1e-4, pct_start=0.1)
 
 '''

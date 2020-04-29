@@ -79,6 +79,7 @@ data: <ImageDataBunch>
 
     valid_dl:
 
+
 # data.train_ds[0] returns (data.train.x[0], data.train.y[0])
 # data.valid_ds[0] returns (data.valid.x[0], data.valid.y[0])
 '''
