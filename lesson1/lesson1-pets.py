@@ -8,8 +8,8 @@
 %matplotlib inline
 '''
 
-'''
 # directory
+'''
 /root/.fastai
     /data
         /oxford-iiit-pet
@@ -22,6 +22,7 @@
 
 '''
 
+# input data (data bunch)
 '''
 # data = ImageDataBunch.from_name_re(
     path_img, fnames, pat, ds_tfms=get_transforms(), size=224, bs=bs
@@ -73,8 +74,10 @@ data <ImageDataBunch>
 
             path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
         
-# data.dataset.x[i] === data.fix_dl.dataset.x[i] === data.train_dl.dataset.x[i]
+'''
 
+# data.dataset[i], data.fix_dl.dataset[i]
+'''
 # data.dataset[i] returns a tuple;
 VARIABLE-TRANSFORMED version of (data.dataset.x[i], data.dataset.y[i]) 
 
@@ -85,7 +88,6 @@ FIXED-TRANSFORMED version of (data.fix_dl.dataset.x[i], data.fix_dl.dataset.y[i]
 
 # data.train_dl.dataset[0] returns a tuple;
 VARIABLE-TRANSFORMED version of (data.train_dl.dataset.x[i], data.train_dl.dataset.y[i])
-
 '''
 
 

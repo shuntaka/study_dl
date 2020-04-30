@@ -25,6 +25,7 @@
 
 '''
 
+# input data (src)
 '''
 # src = (SegmentationItemList.from_folder(path_img)
         .split_by_fname_file('../valid.txt')
@@ -78,7 +79,10 @@ src < LabelLists >
             [100] ImageSegment(1, 720, 960)
 
         path < PosixPath > (/root/.fastai/data/camvid/iamges)
+'''
 
+# input data (data bunch)
+'''
 # data = (src.transform(get_transforms(), size=size, tfm_y=True)
         .databunch(bs = bs)
         .normalize(imagenet_stats))
@@ -213,15 +217,19 @@ data < ImageDataBunch >
                 [100] < ImageSegment > (ImageSegment(1, 360, 480)
 
             path < PosixPath > (/root/.fastai/data/planet)
-
-    # data.fix_dl.dataset[i] returns
-        FIXED TRANSFORM of(data.fix_dl.dataset.x[i], data.fix_dl.dataset.y[i])
-
-    # data.train_dl.dataset[i] returns
-        VARIABLE TRANSFORM of(data.train_dl.dataset.x[i], data.train_dl.dataset.y[i])
-
 '''
 
+# data.fix_dl.dataset[i]
+'''
+# data.fix_dl.dataset[i] returns
+    FIXED TRANSFORM of(data.fix_dl.dataset.x[i], data.fix_dl.dataset.y[i])
+
+# data.train_dl.dataset[i] returns
+    VARIABLE TRANSFORM of(data.train_dl.dataset.x[i], data.train_dl.dataset.y[i])
+'''
+
+
+# shapes of image & mask
 '''
 # img.shape
 torch.Size([3, 720, 960])

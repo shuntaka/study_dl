@@ -4,7 +4,7 @@
 '''
 
 
-# directory structure
+# directory
 '''
 /root/.fastai
         /data
@@ -15,7 +15,7 @@
 '''
 
 
-# get data
+# csv
 '''
 path = untar_data(URLs.ADULT_SAMPLE)
 df = pd.read_csv(path/'adult.csv')
@@ -26,7 +26,7 @@ age	workclass	fnlwgt	education	education-num	marital-status	occupation	relations
 1	44	Private	236746	Masters	14.0	Divorced	Exec-managerial	Not-in-family	White	Male	10520	0	45	United-States	>=50k
 2	38	Private	96185	HS-grad	NaN	Divorced	NaN	Unmarried	Black	Female	0	0	32	United-States	<50k
 '''
-
+# create data
 '''
 data <TabularDataBunch>
         dataset <LabelList> (32361 items)
@@ -227,11 +227,13 @@ Path: /root/.fastai/data/adult_sample, model=TabularModel(
   (14): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
   (15): Linear(in_features=100, out_features=2, bias=True)
 )], add_time=True, silent=False)>
+'''
 
-
-# 42 in Linear(in_features=42, out_features=200, bias=True)
-  corresponds to the sum of the 'width'of embedding vectors; 6, 8, 5, 8 ,5, 4, 3
-  and the number of the continuous variables (=3)
+# interpretation of learn.summary
+'''
+42 in Linear(in_features=42, out_features=200, bias=True)
+corresponds to the sum of the 'width'of embedding vectors; 6, 8, 5, 8 ,5, 4, 3
+and the number of the continuous variables (=3)
 
 '''
 
@@ -258,12 +260,12 @@ data = (TabularList.from_df(df, path=path, cat_names=cat_names, cont_names=cont_
         .add_test(test)
         .databunch())
 
-# create learner
+# create model
 learn = tabular_learner(data, layers=[200, 100], metrics=accuracy)
 
 learn.summary
 
-# learn
+# train model
 learn.fit(1, 1e-2)
 
 # inference

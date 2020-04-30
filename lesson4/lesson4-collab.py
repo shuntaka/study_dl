@@ -165,6 +165,7 @@ data <TabularDataBunch>
 '''
 
 # model
+#
 '''
 # learn.summary
 
@@ -172,14 +173,14 @@ data <TabularDataBunch>
 
 Train: LabelList (90000 items)
 x: CollabList
-userId 196; title Kolya (1996); ,userId 63; title Kolya (1996); ,userId 226; title Kolya (1996); ,userId 154; title Kolya (1996); ,userId 306; title Kolya (1996); 
+userId 196; title Kolya (1996); ,userId 63; title Kolya (1996); ,userId 226; title Kolya (1996); ,userId 154; title Kolya (1996); ,userId 306; title Kolya (1996);
 y: FloatList
 3.0,3.0,5.0,3.0,5.0
 Path: .;
 
 Valid: LabelList (10000 items)
 x: CollabList
-userId 498; title Casino (1995); ,userId 642; title Pocahontas (1995); ,userId 58; title 2001: A Space Odyssey (1968); ,userId 495; title Cat People (1982); ,userId 618; title Philadelphia (1993); 
+userId 498; title Casino (1995); ,userId 642; title Pocahontas (1995); ,userId 58; title 2001: A Space Odyssey (1968); ,userId 495; title Cat People (1982); ,userId 618; title Philadelphia (1993);
 y: FloatList
 3.0,5.0,4.0,3.0,3.0
 Path: .;
@@ -204,11 +205,7 @@ from google.colab import drive
 user, item, title = 'userId', 'movieId', 'title'
 
 
-#
-# sample data
-#
-
-# get data
+# with sample data > create data
 path = untar_data(URLs.ML_SAMPLE)
 path.ls()
 
@@ -219,27 +216,50 @@ ratings.head()
 data = CollabDataBunch.from_df(ratings, seed=42)
 y_range = [0, 5.5]
 
+# with sample data > create model
 learn = collab_learner(data, n_factors=50, y_range=y_range)
+
+# with sample data > train model
 learn.fit_one_cycle(3, 5e-3)
 
-#
-# Movielens 100k
-#
-
-# create data
+# with Movielens 100k > create data
 path = Config.data_path()/'ml-100k'
 
 ratings = pd.read_csv(path/'u.data', delimiter='\t', header=None,
                       names=[user, item, 'rating', 'timestamp'])
 ratings.head()
+'''
+userId	movieId	rating	timestamp
+0	196	242	3	881250949
+1	186	302	3	891717742
+2	22	377	1	878887116
+3	244	51	2	880606923
+4	166	346	1	886397596
+'''
 
 movies = pd.read_csv(path/'u.item',  delimiter='|', encoding='latin-1', header=None,
                      names=[item, 'title', 'date', 'N', 'url', *[f'g{i}' for i in range(19)]])
 movies.head()
+'''
+movieId	title	date	N	url	g0	g1	g2	g3	g4	g5	g6	g7	g8	g9	g10	g11	g12	g13	g14	g15	g16	g17	g18
+0	1	Toy Story(1995)	01-Jan-1995	NaN	http: // us.imdb.com/M/title-exact?Toy % 20Story % 2...	0	0	0	1	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0
+1	2	GoldenEye(1995)	01-Jan-1995	NaN	http: // us.imdb.com/M/title-exact?GoldenEye % 20(...	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0
+2	3	Four Rooms(1995)	01-Jan-1995	NaN	http: // us.imdb.com/M/title-exact?Four % 20Rooms % ...	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0
+3	4	Get Shorty(1995)	01-Jan-1995	NaN	http: // us.imdb.com/M/title-exact?Get % 20Shorty % ...	0	1	0	0	0	1	0	0	1	0	0	0	0	0	0	0	0	0	0
+4	5	Copycat(1995)	01-Jan-1995	NaN	http: // us.imdb.com/M/title-exact?Copycat % 20(1995)	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	1	0	0
+'''
+
 
 rating_movie = ratings.merge(movies[[item, title]])
 rating_movie.head()
-
+'''
+userId	movieId	rating	timestamp	title
+0	196	242	3	881250949	Kolya(1996)
+1	63	242	3	875747190	Kolya(1996)
+2	226	242	5	883888671	Kolya(1996)
+3	154	242	3	879138235	Kolya(1996)
+4	306	242	5	876503793	Kolya(1996)
+'''
 
 data = CollabDataBunch.from_df(
     rating_movie, seed=42, valid_pct=0.1, item_name=title)
@@ -247,10 +267,10 @@ data.show_batch()
 
 y_range = [0, 5.5]
 
-# create learner
+# with Movielens 100k > create model
 learn = collab_learner(data, n_factors=40, y_range=y_range, wd=1e-1)
 
-# learn
+# with Movielens 100k > train model
 learn.lr.find()
 learn.recorder.plot(skip_end=15)
 learn.fit_one_cycle(5, 5e-3)

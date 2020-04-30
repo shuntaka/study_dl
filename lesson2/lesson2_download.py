@@ -22,8 +22,8 @@ drive.mount('/content/drive')
 !ls /root/.fastai/data/download
 '''
 
+# directory
 '''
-folder structure is below;
 /content    <= current directory
     /data
     /drive   

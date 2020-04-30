@@ -3,6 +3,12 @@
 !curl https: // course.fast.ai/setup/colab | bash
 '''
 
+# additional dependencies
+'''
+%reload_ext autoreload
+%autoreload 2
+%matplotlib inline
+'''
 
 # copy data from google drive
 '''
@@ -60,6 +66,7 @@ folder structure is below:
 
 '''
 
+# csv file
 '''
 # df = pd.read_csv(path/'train_v2.csv')
     image_name	tags
@@ -78,6 +85,7 @@ folder structure is below:
 
 '''
 
+# input data (src)
 '''
 # src = (ImageList.from_csv(path, 'train_v2.csv', folder='train-jpg', suffix='.jpg')
         .split_by_rand_pct(0.2)
@@ -122,7 +130,10 @@ src <LabelLists>
             ...
             [8094] <MultiCategory> (agriculture;clear;primary;road)
 
+'''
 
+# input data (data bunch)
+'''
 # data = (src.transform(tfms, size=128)
             .databunch().normalize(imagenet_stats))
 
@@ -211,14 +222,6 @@ data <ImageDataBunch>
 
             path <PosixPath> (/root/.fastai/data/planet)
 
-    # data.train_dl.dataset[0] returns
-        VARIABLE TRANSFORM of (Image(3,128,128), MultiCategory(...))
-
-    # data.fix_dl.dataset[0] returns
-        FIXED TRANSFORM of (Image(3,128,128), MultiCategory(...))
-
-
-
     valid <LabelList> (8095 items)
         [0] (Image(3,256,256), MultiCategory(clear;primary;road))
         [1] (Image(3,256,256), MultiCategory(primary;water))
@@ -236,16 +239,15 @@ data <ImageDataBunch>
             [1] <MultiCategory> (clear;primary;water)
             ...
             [8094] <MultiCategory> (agriculture;clear;primary;road)
-
-
-
 '''
 
-# load additional dependencies at the top
+# data.train_dl.dataset[i]
 '''
-%reload_ext autoreload
-%autoreload 2
-%matplotlib inline
+# data.train_dl.dataset[i] returns
+        VARIABLE TRANSFORM of (Image(3,128,128), MultiCategory(...))
+
+# data.fix_dl.dataset[i] returns
+        FIXED TRANSFORM of (Image(3,128,128), MultiCategory(...))
 '''
 
 # create data
