@@ -87,6 +87,9 @@ FIXED-TRANSFORMED version of (data.fix_dl.dataset.x[i], data.fix_dl.dataset.y[i]
 VARIABLE-TRANSFORMED version of (data.train_dl.dataset.x[i], data.train_dl.dataset.y[i])
 
 '''
+
+
+# create data
 from fastai.vision import *
 from fastai.metrics import error_rate
 bs = 64
@@ -103,18 +106,27 @@ np.random.seed(2)
 pat = r'/([^/]+)_\d.jpg$'
 
 data = ImageDataBunch.from_name_re(
-    path_img, fnames, pat, ds_tfms=get_transforms(), size=224, bs=bs)
-.normalize(imagenet_stats)
+    path_img,
+    fnames,
+    pat,
+    ds_tfms=get_transforms(),
+    size=224,
+    bs=bs
+).normalize(imagenet_stats)
 
 
 data.show_batch(rows=3, figsize=(7, 6))
 
+# create model
 learn = cnn_learner(data, models.resnet34, metrics=error_rate)
+
+# train model
 learn.fit_one_cycle(4)
 
 learn.save('stage-1')
 
-interp = ClassificationInterpretation.from_learner(learner)
+# interpret
+interp = ClassificationInterpretation.from_learner(learn)
 
 losses, idxs = iterp.top_losses()
 len(data.valid_ds) == len(losses) == len(idxs)
@@ -128,6 +140,7 @@ interp.plot_top_losses(9, figsize=(15, 11))
 interp.plot_confusion_matrix(figsize=(12, 12), dpi=60)
 interp.most_confused(min_val=2)
 
+# fine tune model
 learn.unfreez()
 learn.fit_one_cycle(1)
 
@@ -218,3 +231,32 @@ learn.fit_one_cycle(1)
 learn.load('stage-1')
 learn.lr_find()
 learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-4))
+
+'''
+practice2
+'''
+
+bs = 64
+path = untar_data(URLs.PETS)
+path_anno = path/'annotations'
+path_img = path/'images'
+fnames = get_image_files(path_img)
+
+np.random.seed(2)
+pat = r'/([^/]+)_\d.jpg$'
+
+data = ImageDataBunch.from_name_re(
+    path_img, fnames, pat, ds_tfms=get_transforms(), size=224, bs=bs
+).normalize(imagenet_stats)
+
+learn = cnn_learner(data, models, resnet34, metrics=error_rate)
+
+learn.fit_one_cycle(4)
+
+learn.save('stage-1')
+
+interp = ClassificaitonInterpretation.from_learner(learn)
+losses, idxs = interp.top_losses()
+interp.plot_top_losses(9, figsize=(15, 11))
+interp.plot_confusion_matrix(figsize=(12, 12), dpi=60)
+interp.most_confused(min_val=2)
