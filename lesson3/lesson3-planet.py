@@ -161,26 +161,6 @@ data <ImageDataBunch>
 
         path <PosixPath> (/root/.fastai/data/planet)
 
-    train <LabelList> (32384 items)
-        [0] (Image(3,256,256), MultiCategory(haze;primary))
-        [1] (Image(3,256,256), MultiCategory(clear;primary))
-        ...
-        [32383](Image(3,256,256), MultiCategory(agriculture;cultivation;partly_cloudy;primary))
-
-        x <ImageList> (323384 items)
-            [0] <Image> (Image(3,256,256)
-            [1] <Image> (Image(3,256,256)
-            ...
-            [32383] <Image> (Image(3,256,256)
-
-        y <MultiCateogryList> (32384 items)
-            [0] <MultiCategory> (haze;primary)
-            [1] <MultiCategory> (clear;primary)
-            ...
-            [32383] <MultiCategory> (agriculture;cultivation;partly_cloudy;primary)
-
-        path <PosixPath> (/root/.fastai/data/planet)
-
     train_ds <LabelList> (32384 items)
         [0] (Image(3,256,256), MultiCategory(haze;primary))
         [1] (Image(3,256,256), MultiCategory(clear;primary))
@@ -200,6 +180,26 @@ data <ImageDataBunch>
             [32383] <MultiCategory> (agriculture;cultivation;partly_cloudy;primary)
 
         path <PosixPath> (/root/.fastai/data/planet)
+
+    valid_ds <LabelList> (8095 items)
+        [0] (Image(3,256,256), MultiCategory(clear;primary;road))
+        [1] (Image(3,256,256), MultiCategory(primary;water))
+        ...
+        [8094](Image(3,256,256), MultiCategory(agriculture;clear;primary;road)
+
+        x <ImageList>
+            [0] <Image> (Image(3,256,256)
+            [1] <Image> (Image(3,256,256)
+            ...
+            [8094] <Image> (Image(3,256,256)
+
+        y <MultiCategoryList>
+            [0] <MultiCategory> (clear;primary;road)
+            [1] <MultiCategory> (clear;primary;water)
+            ...
+            [8094] <MultiCategory> (agriculture;clear;primary;road)
+
+    fix_dl
 
     train_dl <DeviceDataLoader>
         dataset <LabelList> (32384 items)
@@ -222,23 +222,8 @@ data <ImageDataBunch>
 
             path <PosixPath> (/root/.fastai/data/planet)
 
-    valid <LabelList> (8095 items)
-        [0] (Image(3,256,256), MultiCategory(clear;primary;road))
-        [1] (Image(3,256,256), MultiCategory(primary;water))
-        ...
-        [8094](Image(3,256,256), MultiCategory(agriculture;clear;primary;road)
+    valid_dl
 
-        x <ImageList>
-            [0] <Image> (Image(3,256,256)
-            [1] <Image> (Image(3,256,256)
-            ...
-            [8094] <Image> (Image(3,256,256)
-
-        y <MultiCategoryList>
-            [0] <MultiCategory> (clear;primary;road)
-            [1] <MultiCategory> (clear;primary;water)
-            ...
-            [8094] <MultiCategory> (agriculture;clear;primary;road)
 '''
 
 # data.train_dl.dataset[i]

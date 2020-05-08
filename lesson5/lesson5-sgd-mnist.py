@@ -8,7 +8,17 @@
 %matplotlib inline
 '''
 
-# directory structure
+# copy data from google drive
+'''
+from google.colab import drive
+drive.mount('/content/drive')
+!ls drive/My\ Drive/Colab\ Notebooks/FastAI/data/mnist
+
+!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/mnist/ /root/.fastai/data/
+!ls /root/.fastai/data/mnist
+'''
+
+# directory
 '''
 folder structure is below:
 /content    <= current directory
@@ -24,23 +34,14 @@ folder structure is below:
                 /mnist.pkl.gz
 '''
 
-# path
+
+#
+# create data
+#
+
 from fastai.basics import *
 path = Config.data_path()/'mnist'
 
-
-# mount
-'''
-from google.colab import drive
-drive.mount('/content/drive')
-!ls drive/My\ Drive/Colab\ Notebooks/FastAI/data/mnist
-'''
-
-# copy the data
-'''
-!cp -r drive/My\ Drive/Colab\ Notebooks/FastAI/data/mnist/ /root/.fastai/data/
-!ls /root/.fastai/data/mnist
-'''
 
 # open image
 with gzip.open(path/'mnist.pkl.gz', 'rb') as f:

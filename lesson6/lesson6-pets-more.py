@@ -3,6 +3,77 @@
 !curl https: // course.fast.ai/setup/colab | bash
 '''
 
+# matplot
+'''
+%matplotlib inline
+%reload_ext autoreload
+%autoreload 2
+%matplotlib inline
+'''
+
+# directory
+'''
+/root/.fastai
+    /data
+        /oxford-iiit-pet
+            /images
+                /staffordshire_bull_terrier_114.jpg
+                /saint_bernard_188.jpg
+                /Persian_144.jpg
+                /Maine_Coon_268.jpg
+                /newfoundland_95.jpg
+
+'''
+
+
+# input data
+'''
+data <ImageDataBunch>
+    dataset <LabelList> (5912 items)
+        x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), ...)
+
+        y <CategoryList> (5912 items) (Sphynx, Persian, beagle, Egyptian, Mau, pomeranian) 
+
+        path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+
+    train_ds <LabelList> (5912 items)
+        x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), ...)
+
+        y <CategoryList> (5912 items) (Sphynx, Persian, beagle, Egyptian, Mau, pomeranian) 
+
+        path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+
+    valid_ds <LabelList> (1478 items)
+        x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), Image(3, 224, 224), ...)
+
+        y <CategoryList> (keeshond, amerian_pit_bull_terrier, german_)
+
+        path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+
+    fix_dl <DeviceDataLoader>
+        dataset <LabelList> (5912 items)
+            x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), ...)
+
+            y <CategoryList> (5912 items) (Sphynx, Persian, beagle, Egyptian, Mau, pomeranian) 
+
+            path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+
+    train_dl <DeviceDataLoader>
+        dataset <LabelList> (5912 items)
+            x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), ...)
+
+            y <CategoryList> (5912 items) (Sphynx, Persian, beagle, Egyptian, Mau, pomeranian) 
+
+            path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+    
+    valid_dl <DeviceDataLoader>
+        dataset <LabelList> (1478 items)
+            x <ImageList> ( Image(3, 224, 224), Image(3, 224, 224), Image(3, 224, 224), ...)
+
+            y <CategoryList> (keeshond, amerian_pit_bull_terrier, german_)
+
+            path <PosixPath> (/root/.fastai/data/oxford-iiit-pet/images)
+'''
 
 # model
 '''
@@ -171,7 +242,7 @@ Sequential(
     {kernel height x kernel width x kenel depth}
      x number of kernel 
 
-- kernel depth is equal to the depth of the output tensor.
+- kernel depth is equal to the depth of activations.
   3, 64, 64, 64...128,128,...256,256,...,512,512...
 
 ======================================================================
@@ -384,20 +455,11 @@ Total params: 21,831,599
 Total trainable params: 563,951
 Total non-trainable params: 21,267,648
 '''
+
+# create data (with zero padding)
+
 from fastai.vision import *
 from fastai.callbacks.hooks import *
-print(learn.summary)
-
-
-# matplot
-'''
-%matplotlib inline
-%reload_ext autoreload
-%autoreload 2
-%matplotlib inline
-'''
-
-
 bs = 64
 path = untar_data(URLs.PETS)/'images'
 
@@ -413,7 +475,6 @@ def get_data(size, bs, padding_mode='reflection'):
             .databunch(bs=bs).normalize(imagenet_stats))
 
 
-#
 data = get_data(224, bs, 'zeros')
 
 
@@ -423,35 +484,51 @@ def _plot(i, j, ax):
 
 
 plot_multi(_plot, 3, 3, figsize=(8, 8))
+'''
+images transformed with zero padding shown here
+'''
 
-#
+# create data (with padding by reflection)
 data = get_data(224, bs)
 plot_multi(_plot, 3, 3, figsize=(8, 8))
+'''
+images transformed with some padding shown here
+'''
 
 gc.collect()
+
+# create model
 learn = cnn_learner(data, models.resnet34, metrics=error_rate, bn_final=True)
+
+# train model
 learn.fit_one_cycle(3, slice(1e-2), pct_start=0.8)
 
-#
+# fine tune model
 learn.unfreeze()
 learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-3), pct_start=0.8)
 
-#
+# with bigger size > create data
 data = get_data(352, bs)
 learn.data = data
+
+# with bigger size > train model
+learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-4))
 learn.save('352')
 
-#
+# convolutional kernel > create data
 data = get_data(352, 16)
+
+# convolutional kernel > create model
 learn = cnn_learner(data, models.resnet34,
                     metrics=error_rate, bn_final=True).load('352')
 
+# convolutional kernel > show an input image and its label
 idx = 0
 x, y = data.valid_ds[idx]
 x.show()
 data.valid_ds.y[idx]
 
-# kernel
+# convolutional kernel > show 'edge' kernel
 k = tensor([
     [0.,  -5/3, 1],
     [-5/3, -5/3, 1],
@@ -478,7 +555,7 @@ k.shape
 torch.Size([1,3,3,3])
 '''
 
-# a image
+# convolutional kernel > show input shape
 t = data.valid_ds[0][0].data
 t.shape
 '''
@@ -490,20 +567,32 @@ t[None].shape
 torch.Size([1, 3, 352, 352])
 '''
 
-# convoluted image
+# convolutional kernel > convoluted image by 'edge' kernel
 edge = F.conv2d(t[None], k)
-
 show_image(edge[0], figsize=(5, 5))
+'''
+convoluted image shown here
+'''
 
+# convolutional kernel > output activations
 data.c
 '''
 37
 '''
 
+# convolutional kernel > model detail
 learn.model
+'''
+model detail shown here
+'''
 
+# convolutional kernel > model summary
 print(learn.summary)
+'''
+model summary show here
+'''
 
+# heatmap
 m = learn.model.eval()
 xb, _ = data.one_item(x)
 xb_im = Image(data.denorm(xb)[0])
